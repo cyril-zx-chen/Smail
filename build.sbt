@@ -2,14 +2,16 @@ ThisBuild / version := "0.1.0-SNAPSHOT"
 
 ThisBuild / scalaVersion := "2.13.10"
 
-wartremoverErrors ++= Warts.unsafe
-
 val refinedVersion = "0.10.1"
 val hedgehogVersion = "0.10.0"
 val catsVersion = "2.9.0"
 val catsEffectVersion = "3.4.7"
 
 lazy val smail = (project in file("."))
+  .settings(
+    Compile / compile / wartremoverErrors := Warts.allBut(Wart.Any, Wart.Nothing),
+    Test / compile / wartremoverErrors := Warts.allBut(Wart.Any, Wart.Nothing)
+  )
   .settings(
     name := "Smail",
     libraryDependencies ++= Seq(
