@@ -23,11 +23,10 @@ object EmailAddressSpec extends Properties {
   def testEmailImplicit: Property = genEmailElements.map(tuple => {
     val (n, d, t) = tuple
     val email = s"$n@$d.$t"
-    (email.toEmailAddress match {
-      case Left(value) => Result.failure
-      case Right(value) => Result.success
-    }) and
-      Result.assert(email.validate)
+    email.toEmailAddress match {
+      case Left(_) => Result.failure
+      case Right(EmailAddress(name, domain, tld)) => name.value ==== n and domain.value ==== d and tld.value ==== t
+    }
   })
 
   def testValidate: Property = genEmailElements.map(tuple => {
@@ -45,8 +44,8 @@ object EmailAddressSpec extends Properties {
 
   def testMissField: Property = genEmailElements.map(tuple => {
     val (n, d, t) = tuple
-    val emailMissingName = s"$n@$d."
-    val emailMissingDomain = s"$n@$d."
+    val emailMissingName = s"@$d.$t"
+    val emailMissingDomain = s"$n@.$t"
     val emailMissingTld = s"$n@$d."
     emailMissingName.toEmailAddress.fold(error => error ==== missingField(emailMissingName), _ => Result.failure) and
       emailMissingDomain.toEmailAddress.fold(error => error ==== missingField(emailMissingDomain), _ => Result.failure) and
